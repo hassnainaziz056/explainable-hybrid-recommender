@@ -187,9 +187,12 @@ def load_foodcom(
     }, inplace=True)
 
     # Parse timestamp to unix seconds (integer)
-    reviews["timestamp"] = pd.to_datetime(
-        reviews["timestamp"], utc=True, errors="coerce"
-    ).astype("int64") // 10**9  # nanoseconds → seconds
+    # Convert via an explicit epoch delta so the result is in seconds whatever
+    # the datetime resolution is (pandas 3 defaults to µs, pandas 2 to ns).
+    _dt = pd.to_datetime(reviews["timestamp"], utc=True, errors="coerce")
+    reviews["timestamp"] = (
+        (_dt - pd.Timestamp("1970-01-01", tz="UTC")) // pd.Timedelta(seconds=1)
+    )
 
     reviews.dropna(subset=["user_id", "item_id", "rating", "timestamp"],
                    inplace=True)

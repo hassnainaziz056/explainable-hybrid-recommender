@@ -101,7 +101,7 @@ def test_kitchen_mode_empty_input_graceful():
     data = get_cached_data("foodcom")
     models = get_cached_models("foodcom")
     model = models["hybrid_adaptive"]
-    user_id = data["archetypes"]["Mid-activity user (ID 434952, 29 ratings)"]
+    user_id = next(v for k, v in data["archetypes"].items() if k.startswith("Mid-activity user"))
 
     for empty_val in ["", "   ", None]:
         recs, warn = get_recommendations_for_model(
